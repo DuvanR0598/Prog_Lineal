@@ -1,13 +1,18 @@
 import numpy as np
-
+import sys
 from src.utils import load_problem
 from src.simplex import to_standard_form, simplex_method, interpret_solution
 from src.sensitivity import analyze_sensitivity
+from src.graphical import plot_solution  # Importar la función gráfica
 
 def main():
     # 1. Cargar problema
+    if len(sys.argv) < 2:
+        print("Usa el comando: python main.py <ruta_al_problema>")
+        return
+    ruta_problema = sys.argv[1]
     try:
-        problem = load_problem('data/problema2.txt')
+        problem = load_problem(ruta_problema)
     except FileNotFoundError:
         print("Error: Archivo no encontrado. Verifica la ruta.")
         return
@@ -46,14 +51,29 @@ def main():
     # 5. Mostrar solución
     print("\n--- Solución Óptima ---")
     if problem['type'] == 'max':
-        solution['z'] = solution['z']  # Ajustar para maximización
+        solution['z'] = -solution['z']  # Ajustar para maximización (corregido el signo)
 
     # Mostrar todas las variables
     for j in range(len(solution['x'])):
         print(f"x_{j+1} = {solution['x'][j]:.2f}")
     print(f"Valor óptimo: Z = {solution['z']:.2f}")
 
-    # 6. Análisis de sensibilidad
+    # 6. Visualización gráfica (solo para problemas 2D)
+    if 2 <= len(problem['c']) <= 3:
+        try:
+            plot_solution(
+                problem['A'],
+                problem['b'],
+                problem['signs'],
+                solution,
+                problem['c']  # Coeficientes de la FO
+            )
+        except Exception as e:
+            print(f"\nError al generar visualización: {str(e)}")
+    else:
+        print(f"\nVisualización no disponible para {len(problem['c'])} variables")
+
+    # 7. Análisis de sensibilidad
     try:
         sensitivity = analyze_sensitivity(
             final_tableau,

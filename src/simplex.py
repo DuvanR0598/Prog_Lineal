@@ -180,7 +180,7 @@ def simplex_method(std_problem, max_iter=100):
         entering = select_entering_variable(tableau)
         leaving = select_leaving_variable(tableau, entering)
         pivot(tableau, leaving, entering)
-        print(f"Iteración {iteration+1}:")
+        print(f"\nIteración {iteration+1}:")
         print_tableau(tableau)
     
     return tableau
